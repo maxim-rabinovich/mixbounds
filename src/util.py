@@ -1,6 +1,5 @@
 from collections import namedtuple
 
-from numba import vectorize, float32, float64
 import numpy as np
 
 Interval = namedtuple("Interval", ["lo", "hi"])
@@ -13,10 +12,10 @@ def cov(X):
     mean = np.mean(X, axis = 0)
     return second_moment(X) - np.outer(mean, mean)
 
-@vectorize([float32(float32), float64(float64)])
-def threshold(x):
+def threshold_base(x):
     return float(x > 0.0)
 
+threshold = np.vectorize(threshold_base)
 
 def clip(interval):
     return intersect([interval, Interval(0.0, 1.0)])
