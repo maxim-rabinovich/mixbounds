@@ -68,8 +68,8 @@ def get_feasible_centers_cvx(pi_hat, mu_hat, S_hat, Rho, base_intervals):
     constraints = [
         mu_hat == centers.T * pi_hat,
         *[
-            S_hat[i,j] == (Rho[i,j] + pi_hat[0] * centers[0][i] * centers[0][j]
-                                    + pi_hat[1] * centers[1][i] * centers[1][j])
+            S_hat[i,j] == (Rho[i,j] + pi_hat[0] * centers[0,i] * centers[0,j]
+                                    + pi_hat[1] * centers[1,i] * centers[1,j])
             for i in range(dim-1) for j in range(i + 1, dim)
         ]
     ]
