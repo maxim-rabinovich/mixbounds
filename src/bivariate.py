@@ -50,8 +50,11 @@ def main():
     first_intervals = first_intervals
     base_intervals = first_intervals
 
-    feasible_centers = moments.get_feasible_centers_brute((0, 0),
-                                                          pi, mu_hat, S_hat, Rho, base_intervals)
+    feasible_centers = moments.get_feasible_centers_cvx(pi, mu_hat, S_hat, Rho, base_intervals)
+
+    #moments.get_feasible_centers_brute((0, 0),
+    #                                   pi, mu_hat, S_hat, Rho, base_intervals)
+
     for centers in feasible_centers:
         print(centers[0], centers[1])
 
