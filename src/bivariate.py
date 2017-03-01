@@ -56,7 +56,7 @@ def main():
     #                                   pi, mu_hat, S_hat, Rho, base_intervals)
 
     for centers in feasible_centers:
-        print(centers[0], centers[1])
+        print(centers) #centers[0], centers[1])
 
     for t in range(1):
         second_intervals = [
@@ -87,4 +87,7 @@ def main():
             print()
 
 if __name__ == "__main__":
+    import sys
+    sys.path.append("/home/ubuntu/qcqp/qcqp")
+    
     main()

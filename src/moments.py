@@ -61,21 +61,26 @@ def get_feasible_centers_brute(pivot, pi_hat, mu_hat, S_hat, Rho,
 
 def get_feasible_centers_cvx(pi_hat, mu_hat, S_hat, Rho, base_intervals):
     import cvxpy as cvx
-
+    import qcqp
+    
     dim = mu_hat.shape[0]
 
     centers = cvx.Variable(2, dim)
+    print(centers[0,1].__class__)
+    
     constraints = [
         mu_hat == centers.T * pi_hat,
         *[
             S_hat[i,j] == (Rho[i,j] + pi_hat[0] * centers[0,i] * centers[0,j]
                                     + pi_hat[1] * centers[1,i] * centers[1,j])
-            for i in range(dim-1) for j in range(i + 1, dim)
+            for i in list(range(dim-1)) for j in list(range(i + 1, dim))
         ]
     ]
 
     obj = cvx.Minimize(1)
     problem = cvx.Problem(obj, constraints)
+    problem.solve(method='qcqp-admm')
+    
     if problem.status != cvx.OPTIMAL:
         raise Exception("cvx returned problem status {}".format(problem.status))
     return centers.value
