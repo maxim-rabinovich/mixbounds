@@ -74,7 +74,8 @@ def get_feasible_centers_cvx(pi_hat, mu_hat, S_hat, Rho, base_intervals):
         ]
     ]
 
-    problem = cvx.Problem(constraints)
+    obj = cvx.Minimize(1)
+    problem = cvx.Problem(obj, constraints)
     if problem.status != cvx.OPTIMAL:
         raise Exception("cvx returned problem status {}".format(problem.status))
     return centers.value
