@@ -23,7 +23,7 @@ def main():
     mu_hat = np.mean(X, axis=0) #pi[0] * mixture.mean(0) + pi[1] * mixture.mean(1)
     S_hat  = util.second_moment(X) #pi[0] * mixture.second_moment(0) + pi[1] * mixture.second_moment(1)
     Rho = pi[0] * mixture.cov(0) + pi[1] * mixture.cov(1)
-    rho = 1.0
+    rho = Rho[0,1]
     Rho[0,1] = rho; Rho[1,0] = Rho[0,1]
 
     print("means =\n{}".format(mixture.means))
