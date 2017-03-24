@@ -1,0 +1,131 @@
+\documentclass[11pt,twoside]{article}  
+
+\usepackage[margin = 2.5cm]{geometry}
+
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+%\usepackage{mathtools}
+
+\newcommand{\E}{\mathbb{E}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+
+\newcommand{\Bern}{\mathrm{Bern}}
+
+\newcommand{\bits}{\lbrace 0,~1\rbrace}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\norm}[1]{\left|\left|{#1}\right|\right|}
+
+\newcommand{\mupart}{\mathcal{M}}
+\newcommand{\dists}{\mathcal{P}}
+\newcommand{\funcs}{\mathcal{F}}
+\newcommand{\texists}{\mathrm{exists}}
+
+\begin{document}
+
+\title{Notes on Nonparametric Partial Identification of Mixtures}
+\author{Maxim Rabinovich}
+
+\maketitle
+
+\section{Problem setting and overview}
+
+We are interested in the simple $d$-dimensional mixture model
+\begin{align*}
+Z & \sim \Bern\left(\pi\right), \\
+X ~|~Z = z & \sim \P_{z},
+\end{align*}
+where $\P_{z}$ is some distribution on $\R^{d}$. We assume $\pi$ is known to the practitioner, but that the $\P_{z}$ are not and that estimating
+them is not desired. Rather, we suppose the practitioner seeks to identify the parameters:
+\begin{equation*}
+\mu_{z} = \E_{\P_{z}}\left[X\right], ~~z \in \bits .
+\end{equation*}
+Without either (or both) parametric assumptions on $\P_{z}$ or independence assumptions between the dimensions of $X$, full identification is not possible in general. We therefore settle for partial identification, in the sense that we seek a valid $\alpha$-confidence region $\mupart \subset \R^{d} \times \R^{d}$ for
+$\mu_{0:1} \in \R^{d} \times \R^{d}$. 
+
+The general approach we take is as follows. Let $\dists$ be some collection of allowed pairs $\left(\P_{0},~\P_{1}\right)$. This set could be parametric---e.g. all Gaussians---but the case that interests us is when $\dists$ is entirely nonparametric and defined only in terms of structural constraints on the moments of the $\P_{z}$. The class could be defined by the structure of the covariance matrix $\E\left[XX^{T}\right]$, or by an assumption on the size of $\norm{\mu_{1} - \mu_{0}}_{\infty}$. 
+
+Given a class of candidates $\dists$, we then consider a class $\funcs$ of functions that we call \emph{moment probes}. This class simply describes all
+moments of the distribution that we shall constrain to be close to the observed values. The most naive way to generate a partial identification $\mupart$ 
+given the information we have so far is to solve the following abstract feasibility program:
+\begin{align}
+\texists~\left(\P_{0},~\P_{1}\right) ~~ \text{s.t.} & ~~ \label{eq:feas-basic} \\
+ & ~~ \left(\P_{0},~\P_{1}\right) \in \dists, \nonumber \\
+ & ~~ \forall f \in \funcs,~~ \pi f\left(\P_{0}\right) + (1 - \pi) f \left(\P_{1}\right) = f\left(\hat{\P}\right) , \nonumber
+\end{align}
+where $\hat{\P}$ is the empirical distribution of the observed $X_{i}$'s and $f\left(\P\right) = \E_{\P}\left[f\left(X\right)\right]$. The solution to the feasibility program~\eqref{eq:feas-basic} is a set $\hat{\dists} \subset \dists$ and returning $\mupart = \left\lbrace \mu_{0:1} \colon \mu_{z} = \E_{\P_{z}}\left[X\right], \left(\P_{0},~\P_{1}\right) \in \hat{\dists}\right\rbrace$ would be a partial identification---though not necessarily a valid one, as it does not account for estimation error. 
+
+In order to ensure validity, at the cost of some power, we may suppose given $\epsilon_{f},~f\in\funcs$ such that $\prod_{f \in \funcs} \left[f\left(\hat{\P}\right) \pm \epsilon_{f}\right]$ is a valid $\alpha$-confidence region for $\left(f\left(\P\right)\right)_{f \in \funcs}$. We can then
+modify~\eqref{eq:feas-basic} into
+\begin{align}
+\texists~\left(\P_{0},~\P_{1}\right) ~~ \text{s.t.} & ~~ \label{eq:feas-eps} \\
+ & ~~ \left(\P_{0},~\P_{1}\right) \in \dists, \nonumber \\
+ & ~~ \forall f \in \funcs,~~ \left|\pi f\left(\P_{0}\right) + (1 - \pi) f \left(\P_{1}\right) - f\left(\hat{\P}\right)\right| \leq \epsilon_{f} , \nonumber
+\end{align}
+
+\section{Some examples}
+
+In this section, we consider a few example instantiations of the general framework described above. For simplicity, we focus on the case where 
+$X_{j} \in \left[0,~1\right]$ for all $1 \leq j \leq d$. The requirement that $\P_{z}$ be supported on $[0,~1]$ will be implicit throughout our discussion.
+
+We first analyze the case where $\dists$ consists of distributions with ``poorly separated'' means. In particular, let $0 < \Delta_{j} < 1$ be user-specified
+constants and define
+\begin{equation}\label{eq:}
+\dists = \dists\left(\Delta\right) = \left\lbrace \left(\P_{0},~\P_{1}\right) \colon \left|\E_{\P_{1}}\left[X_{j}\right] - \E_{\P_{0}}\left[X_{j}\right]\right| \leq \Delta_{j} \right\rbrace 
+\end{equation}
+A very simple case under this definition of $\dists$ arises if we take $\funcs = \left\lbrace x \mapsto x_{j} \right\rbrace_{j = 1}^{d}$. Indeed, if we let
+$\hat{\mu} = \frac{1}{n}\sum_{i = 1}^{n} X_{i}$, then we can write the full set of constraints on $\mu_{0:1}$ as
+\begin{align*}
+0 \leq \mu_{z,j} \leq 1,~~ z \in \bits, 1 \leq j \leq d, \\
+-\epsilon_{j} \leq \pi \mu_{0,j} + (1 - \pi) \mu_{1,j} - \hat{\mu}_{j} \leq \epsilon_{j},~~ 1 \leq j \leq d, \\
+-\Delta_{j} \leq \mu_{1,j} - \mu_{0,j} \leq \Delta_{j}, ~~ 1 \leq j \leq d. 
+\end{align*}
+It is easy to see that these joint constraints imply marginal constraints on $\mu_{z,j}$. Indeed, through some simple algebra, we find
+\begin{align*}
+\max\left\lbrace \hat{\mu}_{j} - \epsilon_{j} - (1 - \pi)\Delta_{j},~ 0\right\rbrace \leq \mu_{0,j} \leq \min\left\lbrace\hat{\mu}_{j} + \epsilon_{j} + \left(1 - \pi\right)\Delta_{j},~1\right\rbrace 
+\end{align*}
+If some or all of the $\Delta_{j}$ are small, the resulting constraints can be a substantial tightening of the ordinary first-order constraints that arise from the fact that $\mu_{z,j} \in \left[0,~1\right]$, which have the form
+\begin{align*}
+\max\left\lbrace \frac{\hat{\mu}_{j} - \epsilon_{j} - \left(1 - \pi\right)}{\pi},~0\right\rbrace \leq \mu_{0,j} \leq \min\left\lbrace \frac{\hat{\mu}_{j} + \epsilon_{j}}{\pi},~1\right\rbrace .
+\end{align*}
+
+If $\funcs$ just consists of the coordinate mappings as above, we can easily generate the marginal constraints by hand, or even solve the feasibility program exactly using linear programming methods. Provided we are willing to forego these computational advantages, however, we can obtain even tighter constrains by enlarging $\funcs$ to include $\left\lbrace x \mapsto x_{j}x_{k}\right\rbrace_{1 \leq j < k \leq d}$. Assuming the associated confidence interval widths are $\epsilon_{jk}$, this enlargment adds the constraints
+\begin{equation}
+-\epsilon_{jk} \leq \pi\mu_{0,j}\mu_{0,k} + (1 - \pi)\mu_{1,j}\mu_{1,k} + \rho_{jk} - \hat{S}_{jk} \leq \epsilon_{jk},
+\end{equation}
+where $\hat{S} = \frac{1}{n}\sum_{i} X_{i}X_{i}^{T}$ is the empirical second moment and $\rho_{jk} = \E\left[\left(X_{j} - \mu_{Z,j}\right)\left(X_{k} - \mu_{Z,k}\right)\right]$. Now, we observe that although $\rho_{jk}$ is not directly observable, it does satisfy
+\begin{align*}
+\rho_{jk} & = \E\left[\left(X_{j} - \mu_{j}\right)\left(X_{k} - \mu_{k}\right)\right] + \E\left[\left(\mu_{Z,j} - \mu_{j}\right)\left(\mu_{Z,k} -\mu_{k}\right)\right] \\
+ &~~ - \E\left[\left(X_{j} - \mu_{j}\right)\left(\mu_{Z,k} - \mu_{k}\right)\right] - \E\left[\left(\mu_{Z,j} - \mu_{j}\right)\left(X_{k} - \mu_{k}\right)\right] .
+\end{align*}
+In particular, we have
+\begin{align*}
+\left|\rho_{jk} - \E\left[\left(X_{j} - \mu_{j}\right)\left(X_{k} - \mu_{k}\right)\right]\right| \leq \Delta_{j}\Delta_{k} + \E\left[\left|X_{j} - \mu_{j}\right|\right]\Delta_{k} + \E\left[\left|X_{k} - \mu_{k}\right|\right]\Delta_{j} 
+\end{align*}
+If we suppose $\hat{\lambda}_{j}$ is a computable upper bound on $\E\left[\left|X_{j} - \mu_{j}\right|\right]$ and similarly for $k$ and $\hat{\lambda}_{k}$, then this fact actually allows us to deduce a modified form of the previous constraint that does not involve $\hat{S}_{jk}$ but only $\hat{\mu}_{j}$ and $\hat{\mu}_{k}$, viz.
+\begin{align}
+-\tilde{\epsilon}_{jk} - \Delta_{jk} \leq  \pi\mu_{0,j}\mu_{0,k} + (1 - \pi)\mu_{1,j}\mu_{1,k} - \hat{\mu}_{j}\hat{\mu}_{k} \leq \tilde{\epsilon}_{jk} + \Delta_{jk},
+\end{align}
+where $\tilde{\epsilon}_{jk}$ is the width of the confidence interval around $\hat{\mu}_{j}\hat{\mu_{k}}$ derived from the widths $\epsilon_{\ell}$ around $\hat{\mu}_{\ell}$ for $1 \leq \ell \leq d$ and $\Delta_{jk} = \Delta_{j}\Delta_{k} + \hat{\lambda}_{j}\Delta_{k} + \hat{\lambda}_{k}\Delta_{j}$.  In the special case where we know the $\mu_{\ell}$ exactly (i.e. we do not account for uncertainty in our estimates), the constraint simplifies to
+\begin{equation}
+- \Delta_{jk} \leq  \pi\mu_{0,j}\mu_{0,k} + (1 - \pi)\mu_{1,j}\mu_{1,k} - \hat{\mu}_{j}\hat{\mu}_{k} \leq \Delta_{jk}
+\end{equation}
+
+Another interesting assumption, which we explore more briefly, consists of \emph{stationarity} of the $X_{j}$ for $1 \leq j \leq d$. Specifically,
+we may assume that the joint distribution $\left(X_{j} - \mu_{Z,j},~X_{j + s} - \mu_{Z,j+s}\right)$ is the same for all $1 \leq j \leq d - s$ if the gap $0 < s < d$ is fixed. While this is weaker than the assumption that the $X_{j}$ form a stationary Markov chain, the stationarity assumption alone is already quite powerful. For instance, it already reduces the number of cross second-moment degrees of freedom to $d - 1$ from $\binom{d}{2}$, which in applications can lead to tightening of the first-order partial identification set. 
+
+\section{Connection to Fr\'{e}chet-Hoeffding bounds}
+
+In this section, we explain how our framework relates to the classical subject of Fréchet-Hoeffding  (FH) bounds. Here we specialize to the binary case
+$X_{i} \in \bits$, where all questions become equivalent to questions about contingency tables.
+
+One important difference between our proposed methodology and FH bounds is that, ithout independence assumptions, FH bounds provide no information whatever. On the other hand, all of our discussion in the previous section goes through in this case in order to provide FH-type bounds on
+$\mu_{z,j} = \frac{\P\left(X_{j} = 1,~Z = z\right)}{\P\left(Z = z\right)}$ and therefore on $\P\left(X_{j} = 1,~Z = z\right)$, which is a cell in the contingency table. Since our feasibility programs~\eqref{eq:feas-basic} and~\eqref{eq:feas-eps} operate at the level of {\it distributions}, solving either one provides FH-type bounds for free. Indeed, if $\hat{\dists} \subset \dists$ is the subset of distribution pairs that solve the feasibility program, then for any cell in the contingency table---corresponding to, say, $\P\left(X_{j_1} = b_{1}, \cdots, X_{j_m} = b_{m},~Z = z\right)$, then we can reach the FH-like conclusion that with probability $\geq 1 - \alpha$,
+\begin{align*}
+\inf_{\hat{\P} \in \hat{\dists}} \hat{\P}\left(X_{j_1} = b_{1}, \cdots, X_{j_m} = b_{m},~Z = z\right) & \leq \P\left(X_{j_1} = b_{1}, \cdots, X_{j_m} = b_{m},~Z = z\right) \\
+& \leq \sup_{\hat{\P} \in \hat{\dists}} \hat{\P}\left(X_{j_1} = b_{1}, \cdots, X_{j_m} = b_{m},~Z = z\right)
+\end{align*}
+Since this bound is estimated from data, it comes only with a \emph{probabilistic} guarantee, but the same would be true if FH bounds were stated in terms of probabilities, rather than counts, and if those probabilities were themselves estimated from data (as they would necessarily be in most instances). 
+
+
+
+\end{document}
